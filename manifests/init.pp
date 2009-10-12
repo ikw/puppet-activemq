@@ -55,6 +55,7 @@ class activemq {
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
+    require    => File["/opt/apache-activemq-5.2.0/bin/linux-x86-32/wrapper.conf"],
   }
   
 }
