@@ -33,7 +33,7 @@ class activemq {
     owner   => activemq,
     group   => activemq,
     mode    => 755,
-    require => User["activemq"],
+    require => Exec["activemq_untar"],
   }
   
   file { "/etc/init.d/activemq":
