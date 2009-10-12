@@ -29,10 +29,11 @@ class activemq {
   }
   
   file { ["/var/run/activemq", "/var/log/activemq"]:
-    ensure => directory,
-    owner  => activemq,
-    group  => activemq,
-    mode   => 755,
+    ensure  => directory,
+    owner   => activemq,
+    group   => activemq,
+    mode    => 755,
+    require => User["activemq"],
   }
   
   file { "/etc/init.d/activemq":
