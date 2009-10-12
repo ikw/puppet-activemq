@@ -6,13 +6,18 @@ class activemq {
     managehome => false,
     shell      => "/bin/false",
   }
+
+  group { "activemq":
+    ensure  => present,
+    require => User["activemq"],
+  }
   
   exec { "activemq_download":
     command => "wget https://static.arcs.org.au/apache-activemq-5.2.0-bin.tar.gz",
     cwd     => "/usr/local/src",
     creates => "/usr/local/src/apache-activemq-5.2.0-bin.tar.gz",
     path    => ["/usr/bin", "/usr/sbin"],
-    require => User["activemq"],
+    require => Group["activemq"],
   }
   
   exec { "activemq_untar":
@@ -33,7 +38,7 @@ class activemq {
     owner   => activemq,
     group   => activemq,
     mode    => 755,
-    require => Exec["activemq_untar"],
+    require => Group["activemq"],
   }
   
   file { "/etc/init.d/activemq":
