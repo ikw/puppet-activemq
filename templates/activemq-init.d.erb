@@ -1,4 +1,12 @@
 #! /bin/sh
+### BEGIN INIT INFO
+# Provides:          activemq
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop activemq server
+### END INIT INFO
 
 # ------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,8 +31,15 @@ APP_LONG_NAME="ActiveMQ Broker"
 ACTIVEMQ_HOME="/opt/activemq"
 
 # Wrapper
+<% if architecture == "amd64" %>
+WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"
+WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"
+<% end %>
+
+<% if architecture == "i386" %>
 WRAPPER_CMD="/opt/activemq/bin/linux-x86-32/wrapper"
 WRAPPER_CONF="/opt/activemq/bin/linux-x86-32/wrapper.conf"
+<% end %>
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.

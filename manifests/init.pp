@@ -13,27 +13,43 @@ class activemq {
   }
   
   exec { "activemq_download":
-    command => "wget https://static.arcs.org.au/apache-activemq-5.2.0-bin.tar.gz",
+    command => "wget https://static.arcs.org.au/apache-activemq-5.4.2-bin.tar.gz",
     cwd     => "/usr/local/src",
-    creates => "/usr/local/src/apache-activemq-5.2.0-bin.tar.gz",
+    creates => "/usr/local/src/apache-activemq-5.4.2-bin.tar.gz",
     path    => ["/usr/bin", "/usr/sbin"],
     require => Group["activemq"],
   }
   
   exec { "activemq_untar":
-    command => "tar xf /usr/local/src/apache-activemq-5.2.0-bin.tar.gz && chown -R activemq:activemq /opt/apache-activemq-5.2.0",
+    command => "tar xf /usr/local/src/apache-activemq-5.4.2-bin.tar.gz && chown -R activemq:activemq /opt/apache-activemq-5.4.2",
     cwd     => "/opt",
-    creates => "/opt/apache-activemq-5.2.0",
+    creates => "/opt/apache-activemq-5.4.2",
     path    => ["/bin",],
     require => Exec["activemq_download"],
+#also need to chown activemq:activemq this dir
   }
   
   file { "/opt/activemq":
-    ensure  => "/opt/apache-activemq-5.2.0",
+    ensure  => "/opt/apache-activemq-5.4.2",
     require => Exec["activemq_untar"],
   }
   
-  file { ["/var/run/activemq", "/var/log/activemq"]:
+  file { "/etc/activemq":
+    ensure  => "/opt/activemq/conf",
+    require => File["/opt/activemq"],
+  }
+
+  file { "/var/log/activemq":
+    ensure  => "/opt/activemq/data",
+    require => File["/opt/activemq"],
+  }
+
+  file { "/opt/activemq/bin/linux":
+    ensure  => "/opt/activemq/bin/linux-x86-32",
+    require => File["/opt/activemq"],
+  }
+  
+  file { "/var/run/activemq":
     ensure  => directory,
     owner   => activemq,
     group   => activemq,
@@ -42,13 +58,14 @@ class activemq {
   }
   
   file { "/etc/init.d/activemq":
-    owner  => root,
-    group  => root,
-    mode   => 755,
-    source => "puppet://${servername}/activemq/activemq-init.d",
+    owner   => root,
+    group   => root,
+    mode    => 755,
+    content => template("activemq/activemq-init.d.erb"),
   }
   
-  file {"/opt/apache-activemq-5.2.0/bin/linux-x86-32/wrapper.conf":
+  file {["/opt/apache-activemq-5.4.2/bin/linux-x86-32/wrapper.conf",
+         "/opt/apache-activemq-5.4.2/bin/linux-x86-64/wrapper.conf"]:
     owner   => activemq,
     group   => activemq,
     mode    => 644,
@@ -61,7 +78,7 @@ class activemq {
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    require    => File["/opt/apache-activemq-5.2.0/bin/linux-x86-32/wrapper.conf"],
+    require    => File["/opt/apache-activemq-5.4.2/bin/linux-x86-32/wrapper.conf"],
   }
   
 }
